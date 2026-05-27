@@ -1,6 +1,6 @@
 {
   "name": "link-autopilot",
-  "version": "0.0.1-beta.2",
+  "version": "0.0.1-beta.3",
   "description": "全自动外链铺设 CLI 工具",
   "bin": {
     "link-autopilot": "cli.js"
