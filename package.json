@@ -25,7 +25,7 @@
     "cli"
   ],
   "license": "MIT",
-  "repository": "yuexiaoliang/backlink-blast",
+  "repository": "yuexiaoliang/link-autopilot",
   "scripts": {
     "release": "bumpp"
   },
