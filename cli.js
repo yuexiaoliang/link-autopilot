@@ -229,10 +229,7 @@ export function cmdRmDomain(domain) {
 
 // ── CLI 入口 ──
 
-const isMain = import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith("cli.js");
-
-if (isMain) {
-  const program = new Command();
+const program = new Command();
 
   program
     .name("link-autopilot")
@@ -295,4 +292,3 @@ if (isMain) {
     .action(cmdRmDomain);
 
   program.parse();
-}
