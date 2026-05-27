@@ -235,7 +235,7 @@ if (isMain) {
   const program = new Command();
 
   program
-    .name("backlink-blast")
+    .name("link-autopilot")
     .description("全自动外链铺设 CLI 工具")
     .version("1.0.0");
 

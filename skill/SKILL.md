@@ -1,6 +1,6 @@
 ---
-name: backlink-blast
-description: '全自动外链铺设与反向链接建设。仅当用户消息以 /backlink-blast 开头时激活。触发词：铺设外链、backlink blast、外链建设、海量外链、发布外链。'
+name: link-autopilot
+description: '全自动外链铺设与反向链接建设。仅当用户消息以 /link-autopilot 开头时激活。触发词：铺设外链、link autopilot、外链建设、海量外链、发布外链。'
 metadata:
   author: yuexiaoliang
   version: '1.0.0'
@@ -8,28 +8,28 @@ metadata:
 
 # 铺设海量外链
 
-**触发方式**：用户消息以 `/backlink-blast` 开头时激活。
+**触发方式**：用户消息以 `/link-autopilot` 开头时激活。
 
 读取 `.backlink-data/urls/{域名}.json` 中的 URL 列表，针对每个 URL 检查已铺设平台，找出缺铺的 (URL, 平台) 组合并执行铺设。
 
-## 重要：必须使用 backlink-blast CLI
+## 重要：必须使用 link-autopilot CLI
 
-**禁止自己编写脚本来查询或操作数据。** 所有数据交互通过 `backlink-blast` CLI 完成。
+**禁止自己编写脚本来查询或操作数据。** 所有数据交互通过 `link-autopilot` CLI 完成。
 
 如果 CLI 不可用，告知用户：
-> 请先安装 backlink-blast CLI：`npm install -g backlink-blast`
+> 请先安装 link-autopilot CLI：`npm install -g link-autopilot`
 
 **CLI 命令：**
 
 ```bash
-backlink-blast scan [domain]           # 扫描 sitemap（省略则扫描所有）
-backlink-blast domains                 # 列出活跃域名及缺铺统计
-backlink-blast list <domain>           # 列出缺铺清单
-backlink-blast summary <domain>        # 各平台覆盖统计
-backlink-blast platforms <domain>      # 列出已知平台
-backlink-blast done <domain> <platform> <url>...  # 标记完成
-backlink-blast add-domain <domain>     # 添加监控域名
-backlink-blast rm-domain <domain>      # 移除监控域名
+link-autopilot scan [domain]           # 扫描 sitemap（省略则扫描所有）
+link-autopilot domains                 # 列出活跃域名及缺铺统计
+link-autopilot list <domain>           # 列出缺铺清单
+link-autopilot summary <domain>        # 各平台覆盖统计
+link-autopilot platforms <domain>      # 列出已知平台
+link-autopilot done <domain> <platform> <url>...  # 标记完成
+link-autopilot add-domain <domain>     # 添加监控域名
+link-autopilot rm-domain <domain>      # 移除监控域名
 ```
 
 ## 执行流程（Claude 全自动）
@@ -39,7 +39,7 @@ backlink-blast rm-domain <domain>      # 移除监控域名
 执行铺设前，先运行 sitemap 扫描，确保 URL 列表为最新：
 
 ```bash
-backlink-blast scan
+link-autopilot scan
 ```
 
 此命令会自动从 `.backlink-data/monitored-domains.json` 读取所有活跃域名，抓取 sitemap，发现新 URL 并写入 `.backlink-data/urls/{域名}.json`。
@@ -49,7 +49,7 @@ backlink-blast scan
 运行以下命令查看所有活跃域名及缺铺统计：
 
 ```bash
-backlink-blast domains
+link-autopilot domains
 ```
 
 输出会列出每个活跃域名的 URL 总数、已完成数、待铺数和缺铺组合数。按以下优先级选择目标域名：
@@ -82,7 +82,7 @@ backlink-blast domains
 
 1. 运行命令获取缺铺清单：
    ```bash
-   backlink-blast list {域名}
+   link-autopilot list {域名}
    ```
    命令会读取 `.backlink-data/urls/{域名}.json`，按平台分组输出缺铺的 (URL, 平台) 组合。**不要直接读取 JSON 文件**——文件可能很大，CLI 已为你预处理。
 2. 若缺铺组合数为 0，记录"所有 URL 已覆盖本轮目标平台，执行结束"，直接归档并退出。
@@ -174,10 +174,10 @@ backlink-blast domains
 每个 (URL, 平台) 组合铺设成功后，通过 CLI 更新状态：
 
 ```bash
-backlink-blast done {域名} {平台名} {URL1} {URL2} ...
+link-autopilot done {域名} {平台名} {URL1} {URL2} ...
 ```
 
-- **铺设成功** → `backlink-blast done` 自动将平台名追加到该 URL 的数组中
+- **铺设成功** → `link-autopilot done` 自动将平台名追加到该 URL 的数组中
 - **铺设失败** → 在 `platform-success-rate.md` 记录失败 + 分析原因写入 `lessons/troubleshooting.md`
 - **主动跳过** → 不记录，换其他平台继续尝试
 
@@ -263,7 +263,7 @@ Agent 在本项目中具备以下能力，**不需要人类手动操作**：
 ### 记忆流程
 
 1. **任务启动前：扫描新 URL**
-   - 执行 `backlink-blast scan`，确保 `.backlink-data/urls/{域名}.json` 为最新状态
+   - 执行 `link-autopilot scan`，确保 `.backlink-data/urls/{域名}.json` 为最新状态
 2. **任务启动时：读取历史记忆与账号**
    - 读取 `lessons/` 目录（最高优先级）：确认平台状态、频率限制、文案偏好、异常处理
    - 读取 `.agent-memory/blast/platform-success-rate.md`，优先选择成功率高的平台
