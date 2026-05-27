@@ -1,0 +1,28 @@
+{
+  "name": "backlink-blast",
+  "version": "0.0.0",
+  "description": "全自动外链铺设 CLI 工具",
+  "bin": {
+    "backlink-blast": "cli.js"
+  },
+  "type": "module",
+  "files": [
+    "cli.js",
+    "sitemap-scan.js",
+    "skill/"
+  ],
+  "dependencies": {
+    "commander": "^14.0.3",
+    "fast-xml-parser": "^4.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "backlink",
+    "seo",
+    "link-building",
+    "cli"
+  ],
+  "license": "MIT"
+}
