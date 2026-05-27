@@ -1,6 +1,6 @@
 {
   "name": "link-autopilot",
-  "version": "0.0.0",
+  "version": "0.0.1-beta.1",
   "description": "全自动外链铺设 CLI 工具",
   "bin": {
     "link-autopilot": "cli.js"
@@ -24,5 +24,12 @@
     "link-building",
     "cli"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "repository": "yuexiaoliang/backlink-blast",
+  "scripts": {
+    "release": "bumpp"
+  },
+  "devDependencies": {
+    "bumpp": "^11.1.0"
+  }
 }
