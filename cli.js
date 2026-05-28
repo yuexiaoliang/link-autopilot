@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync } from "node:fs";
 import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 
 // ── 项目根目录查找（惰性）──
@@ -364,12 +365,15 @@ export function cmdLog(date) {
 
 // ── CLI 入口 ──
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(join(__dirname, "package.json"), "utf-8"));
+
 const program = new Command();
 
   program
     .name("link-autopilot")
     .description("全自动外链铺设 CLI 工具")
-    .version("1.0.0");
+    .version(pkg.version);
 
   program
     .command("domains")
