@@ -9,6 +9,7 @@
   "files": [
     "cli.js",
     "sitemap-scan.js",
+    "scripts/",
     "skills/"
   ],
   "dependencies": {
@@ -27,6 +28,7 @@
   "license": "MIT",
   "repository": "yuexiaoliang/link-autopilot",
   "scripts": {
+    "postinstall": "node scripts/postinstall.js",
     "release": "bumpp"
   },
   "devDependencies": {
