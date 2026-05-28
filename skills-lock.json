@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "xiexiu": {
+      "source": "yuexiaoliang/skills",
+      "sourceType": "github",
+      "skillPath": "skills/xiexiu/SKILL.md",
+      "computedHash": "de3f164a3c72c5a3c408fd628702b20daa36722cf35d2f8f4996a7f39f8447bf"
+    }
+  }
+}
