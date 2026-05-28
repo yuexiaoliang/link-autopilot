@@ -32,6 +32,55 @@ export function getRoot() {
 export function getDataDir() { return join(getRoot(), ".backlink-data"); }
 export function getDomainsFile() { return join(getDataDir(), "monitored-domains.json"); }
 export function getUrlsDir() { return join(getDataDir(), "urls"); }
+export function getConfigFile() { return join(getDataDir(), "config.json"); }
+export function getAccountsFile() { return join(getDataDir(), "accounts.json"); }
+export function getKeywordsDir() { return join(getDataDir(), "keywords"); }
+export function getKeywordsFile(domain) { return join(getKeywordsDir(), `${domain}.json`); }
+export function getLogFile(date) { return join(getDataDir(), "platform-submission-log", `${date}.json`); }
+
+// ── 配置操作 ──
+
+export function loadConfig() {
+  const file = getConfigFile();
+  if (!existsSync(file)) return {};
+  return JSON.parse(readFileSync(file, "utf-8"));
+}
+
+export function saveConfig(config) {
+  const file = getConfigFile();
+  writeFileSync(file + ".tmp", JSON.stringify(config, null, 2) + "\n", "utf-8");
+  renameSync(file + ".tmp", file);
+}
+
+// ── 账号操作 ──
+
+export function loadAccounts() {
+  const file = getAccountsFile();
+  if (!existsSync(file)) return {};
+  return JSON.parse(readFileSync(file, "utf-8"));
+}
+
+export function saveAccounts(accounts) {
+  const file = getAccountsFile();
+  writeFileSync(file + ".tmp", JSON.stringify(accounts, null, 2) + "\n", "utf-8");
+  renameSync(file + ".tmp", file);
+}
+
+// ── 关键词缓存操作 ──
+
+export function loadKeywords(domain) {
+  const file = getKeywordsFile(domain);
+  if (!existsSync(file)) return null;
+  return JSON.parse(readFileSync(file, "utf-8"));
+}
+
+export function saveKeywords(domain, data) {
+  const dir = getKeywordsDir();
+  mkdirSync(dir, { recursive: true });
+  const file = getKeywordsFile(domain);
+  writeFileSync(file + ".tmp", JSON.stringify(data, null, 2) + "\n", "utf-8");
+  renameSync(file + ".tmp", file);
+}
 
 // ── 数据操作 ──
 
@@ -227,6 +276,92 @@ export function cmdRmDomain(domain) {
   console.log(`[done] 已移除域名: ${domain}`);
 }
 
+// ── 配置命令 ──
+
+export function cmdConfigEmailDomain(domain) {
+  const config = loadConfig();
+  if (domain) {
+    config.emailDomain = domain;
+    saveConfig(config);
+    console.log(`[done] 邮箱域名已设置为: ${domain}`);
+  } else {
+    if (config.emailDomain) {
+      console.log(config.emailDomain);
+    } else {
+      console.error("[error] 未配置邮箱域名");
+      process.exit(1);
+    }
+  }
+}
+
+// ── 邮箱命令 ──
+
+export function cmdEmailGenerate(platform) {
+  const config = loadConfig();
+  if (!config.emailDomain) {
+    console.error("[error] 未配置邮箱域名，请先执行: link-autopilot config email-domain <domain>");
+    process.exit(1);
+  }
+  const accounts = loadAccounts();
+  if (!accounts[platform]) accounts[platform] = { accounts: [] };
+  const platformAccounts = accounts[platform].accounts;
+  const nextIndex = platformAccounts.length + 1;
+  const email = `${platform}-${nextIndex}@${config.emailDomain}`;
+  platformAccounts.push({ email, status: "pending", createdAt: new Date().toISOString().slice(0, 10) });
+  saveAccounts(accounts);
+  console.log(email);
+}
+
+export function cmdEmailList(platform) {
+  const accounts = loadAccounts();
+  if (platform) {
+    const result = accounts[platform]?.accounts ?? [];
+    console.log(JSON.stringify(result, null, 2));
+  } else {
+    console.log(JSON.stringify(accounts, null, 2));
+  }
+}
+
+// ── 关键词命令 ──
+
+export function cmdKeywordsShow(domain) {
+  const data = loadKeywords(domain);
+  if (!data) {
+    console.log(JSON.stringify({ error: "无关键词缓存" }, null, 2));
+    return;
+  }
+  console.log(JSON.stringify(data, null, 2));
+}
+
+export function cmdKeywordsRefresh(domain) {
+  const data = loadKeywords(domain);
+  if (!data) {
+    console.log(`[info] ${domain}: 无缓存，下次执行任务时自动抓取`);
+    return;
+  }
+  if (data.domain) {
+    delete data.domain;
+    saveKeywords(domain, data);
+    console.log(`[done] ${domain} 域名核心词缓存已清除，URL 页面缓存保留`);
+  } else {
+    console.log(`[info] ${domain}: 无域名核心词缓存`);
+  }
+  console.log("[tip] 下次执行任务时将重新抓取首页关键词");
+}
+
+// ── 日志命令 ──
+
+export function cmdLog(date) {
+  const d = date || new Date().toISOString().slice(0, 10);
+  const file = getLogFile(d);
+  if (!existsSync(file)) {
+    console.log(JSON.stringify({}, null, 2));
+    return;
+  }
+  const data = JSON.parse(readFileSync(file, "utf-8"));
+  console.log(JSON.stringify(data, null, 2));
+}
+
 // ── CLI 入口 ──
 
 const program = new Command();
@@ -290,5 +425,43 @@ const program = new Command();
     .argument("<domain>", "域名")
     .description("移除监控域名")
     .action(cmdRmDomain);
+
+  program
+    .command("config")
+    .argument("<key>", "配置项 (email-domain)")
+    .argument("[value]", "配置值")
+    .description("查看或设置配置项")
+    .action((key, value) => {
+      if (key === "email-domain") cmdConfigEmailDomain(value);
+      else { console.error(`[error] 未知配置项: ${key}`); process.exit(1); }
+    });
+
+  program
+    .command("email")
+    .argument("<subcommand>", "子命令: generate, list")
+    .argument("[platform]", "平台名")
+    .description("邮箱管理")
+    .action((subcommand, platform) => {
+      if (subcommand === "generate") cmdEmailGenerate(platform);
+      else if (subcommand === "list") cmdEmailList(platform);
+      else { console.error(`[error] 未知子命令: ${subcommand}`); process.exit(1); }
+    });
+
+  program
+    .command("keywords")
+    .argument("<subcommand>", "子命令: show, refresh")
+    .argument("<domain>", "域名")
+    .description("关键词缓存管理")
+    .action((subcommand, domain) => {
+      if (subcommand === "show") cmdKeywordsShow(domain);
+      else if (subcommand === "refresh") cmdKeywordsRefresh(domain);
+      else { console.error(`[error] 未知子命令: ${subcommand}`); process.exit(1); }
+    });
+
+  program
+    .command("log")
+    .argument("[date]", "日期 (YYYY-MM-DD，省略则为今天)")
+    .description("查看平台提交日志")
+    .action(cmdLog);
 
   program.parse();

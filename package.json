@@ -9,7 +9,7 @@
   "files": [
     "cli.js",
     "sitemap-scan.js",
-    "skill/"
+    "skills/"
   ],
   "dependencies": {
     "commander": "^14.0.3",
