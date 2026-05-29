@@ -226,11 +226,11 @@ link-autopilot done {域名} {平台名} {URL1} {URL2} ...
 - **铺设失败** → 在 `platform-success-rate.md` 更新失败计数和失败原因摘要；**技术细节和异常分析写入 `lessons/troubleshooting.md`，不重复写入 `platform-success-rate.md`**
 - **主动跳过** → 不记录，换其他平台继续尝试
 
-外链 URL、日期、失败原因等详情记录在 `.backlink-data/blast/history/{日期}-{时分}.md` 中，不在此文件重复存储。
+外链 URL、日期、失败原因等详情记录在 `.backlink-data/memory/history/{日期}-{时分}.md` 中，不在此文件重复存储。
 
 ### Step 4：记忆归档
 
-将铺设结果归档到 `.backlink-data/blast/` 目录。
+将铺设结果归档到 `.backlink-data/memory/` 目录。
 
 ---
 
@@ -285,14 +285,14 @@ Agent 在本项目中具备以下能力，**不需要人类手动操作**：
 
 ## 记忆系统
 
-### 节点格式（插入 `.backlink-data/blast/index.md` 顶部）
+### 节点格式（插入 `.backlink-data/memory/index.md` 顶部）
 
 ```markdown
 - **{YYYY-MM-DD HH:mm}** | [blast] | {目标域名} | 铺设{n}个外链，成功{m} | [{status}] | [详情](history/{文件名}.md)
   - 备注：{平台表现、异常、优化建议}
 ```
 
-### 详细记录文件（`.backlink-data/blast/history/{日期}-{时分}.md`）
+### 详细记录文件（`.backlink-data/memory/history/{日期}-{时分}.md`）
 
 **包含内容**：
 
@@ -302,7 +302,7 @@ Agent 在本项目中具备以下能力，**不需要人类手动操作**：
 - 外链清单（平台 | URL | 锚文本 | 状态）
 - 备注（异常分析 + 优化建议）
 
-### 经验规则库（`.backlink-data/blast/lessons/`）
+### 经验规则库（`.backlink-data/memory/lessons/`）
 
 | 文件 | 内容 |
 |------|------|
@@ -315,7 +315,7 @@ Agent 在本项目中具备以下能力，**不需要人类手动操作**：
 
 ### 平台成功率记录
 
-维护 `.backlink-data/blast/platform-success-rate.md`，记录各平台的历史表现。格式为每平台独立区块，包含总尝试/成功/失败/成功率、最后尝试日期、尝试记录和**简短备注**。
+维护 `.backlink-data/memory/platform-success-rate.md`，记录各平台的历史表现。格式为每平台独立区块，包含总尝试/成功/失败/成功率、最后尝试日期、尝试记录和**简短备注**。
 
 **记录规则**：
 
@@ -331,16 +331,16 @@ Agent 在本项目中具备以下能力，**不需要人类手动操作**：
    - 执行 `link-autopilot scan`，确保 `.backlink-data/urls/{域名}.json` 为最新状态
 2. **任务启动时：读取历史记忆与账号**
    - 读取 `lessons/` 目录（最高优先级）：确认平台状态、频率限制、文案偏好、异常处理
-   - 读取 `.backlink-data/blast/platform-success-rate.md`，优先选择成功率高的平台
+   - 读取 `.backlink-data/memory/platform-success-rate.md`，优先选择成功率高的平台
    - 执行 `link-autopilot email list`，复用已有账号，禁止重复注册
    - 读取 `index.md`（最近 3 条），了解上次执行概况
-   - 按当前日期+时分生成文件名（如 `.backlink-data/blast/history/2026-05-14-1430.md`）
+   - 按当前日期+时分生成文件名（如 `.backlink-data/memory/history/2026-05-14-1430.md`）
 2. **执行过程中**：实时写入铺设事件到详情文件
 3. **任务结束时**：
    - 完善详情文件中的统计和备注
-   - 更新 `.backlink-data/blast/platform-success-rate.md` 中的平台成功率数据
+   - 更新 `.backlink-data/memory/platform-success-rate.md` 中的平台成功率数据
    - 更新 `lessons/` 中如有新经验（API 变更、平台规则调整、新的异常处理）
-   - 在 `.backlink-data/blast/index.md` 顶部插入 `[blast]` 类型节点
+   - 在 `.backlink-data/memory/index.md` 顶部插入 `[blast]` 类型节点
    - 清理 history 文件（仅保留最近 5 个）
    - history 文件已包含完整执行记录与结果汇总，无需额外报告文件
 
@@ -350,10 +350,10 @@ Agent 在本项目中具备以下能力，**不需要人类手动操作**：
 
 每次执行结束后，Claude 自动生成并保存到项目目录：
 
-- `.backlink-data/blast/index.md` — 更新后的任务索引（blast 铺设节点）
-- `.backlink-data/blast/history/{日期}-{时分}.md` — 本次任务的完整执行记录（含策略、明细、统计、优化建议）
-- `.backlink-data/blast/platform-success-rate.md` — 各平台成功率统计（持续更新）
-- `.backlink-data/blast/lessons/*.md` — 经验规则库（持续更新）
+- `.backlink-data/memory/index.md` — 更新后的任务索引（blast 铺设节点）
+- `.backlink-data/memory/history/{日期}-{时分}.md` — 本次任务的完整执行记录（含策略、明细、统计、优化建议）
+- `.backlink-data/memory/platform-success-rate.md` — 各平台成功率统计（持续更新）
+- `.backlink-data/memory/lessons/*.md` — 经验规则库（持续更新）
 - `.backlink-data/platform-submission-log/{YYYY-MM-DD}.json` — 各平台按日期拆分的提交日志（用于频率控制，持久化文件）
 
 ---

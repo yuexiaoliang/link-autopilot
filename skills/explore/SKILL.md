@@ -213,12 +213,12 @@ Agent 必须在历史记录中确认以下项已完成：
 3. **更新 `lessons/rate-limiting.md`**（如测试中获得频率数据）
 
 4. **记录探索日志**
-   - 在 `.backlink-data/blast/history/` 中创建探索记录文件
+   - 在 `.backlink-data/memory/history/` 中创建探索记录文件
    - 命名格式：`{日期}-{时分}-explore.md`
 
 ### Step 6：归档
 
-在 `.backlink-data/blast/index.md` 顶部插入探索节点：
+在 `.backlink-data/memory/index.md` 顶部插入探索节点：
 
 ```markdown
 - **{YYYY-MM-DD HH:mm}** | [explore] | 测试{n}个新平台，通过{m} | [详情](history/{文件名}.md)
@@ -232,10 +232,10 @@ Agent 必须在历史记录中确认以下项已完成：
 
 每次探索结束后生成：
 
-- `.backlink-data/blast/history/{日期}-{时分}-explore.md` — 本次探索完整记录
-- `.backlink-data/blast/index.md` — 插入 [explore] 类型节点
-- `.backlink-data/blast/platform-success-rate.md` — 新增验证通过的平台条目
-- `.backlink-data/blast/lessons/platforms.md` — 更新平台特性说明
+- `.backlink-data/memory/history/{日期}-{时分}-explore.md` — 本次探索完整记录
+- `.backlink-data/memory/index.md` — 插入 [explore] 类型节点
+- `.backlink-data/memory/platform-success-rate.md` — 新增验证通过的平台条目
+- `.backlink-data/memory/lessons/platforms.md` — 更新平台特性说明
 - `.backlink-data/accounts.json` — 新增注册账号信息
 
 ---
