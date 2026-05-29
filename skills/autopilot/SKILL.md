@@ -44,7 +44,14 @@ link-autopilot log [YYYY-MM-DD]               # 查看平台提交日志（省�
 
 本 skill **只操作已知活跃平台**，不执行新平台探索。
 
-活跃平台池由 [[link-explore]] 技能维护。铺设前通过 `platform-success-rate.md` 和 `lessons/platforms.md` 读取当前可用平台列表。
+活跃平台池由 [[link-explore]] 技能维护。铺设前按以下分工读取：
+
+| 文件 | 读取内容 | 不读内容 |
+|------|---------|---------|
+| `platform-success-rate.md` | 各平台成功率、尝试次数、失败原因、最后尝试日期 | 不读 API 格式、认证方式等技术细节 |
+| `lessons/platforms.md` | 各平台 API 格式、认证方式、频率上限、注意事项、不可用平台列表 | 不读统计数据 |
+
+**两个文件各司其职，不重复。** 成功率等统计数据只在 `platform-success-rate.md` 中更新；技术细节和经验教训只在 `lessons/platforms.md` 中更新。
 
 ## 执行流程（Agent 全自动）
 
@@ -95,14 +102,15 @@ domainQuota = max(1, round(domainNeed / totalNeed × totalCapacity))
 
 在开始铺设前，按以下顺序读取记忆并确认：
 
-1. **读取 `lessons/platforms.md`** — 确认各平台当前可用状态、API 格式、已知坑点
+1. **读取 `lessons/platforms.md`** — 确认各平台 API 格式、认证方式、频率上限、已知坑点
    → 标记为"已确认不可用"的平台，直接跳过
 2. **读取 `lessons/rate-limiting.md`** — 确认各平台安全频率
 3. **读取 `lessons/content.md`** — 确认已验证有效的文案模式
 4. **读取 `lessons/troubleshooting.md`** — 确认常见异常处理方式
-5. **读取 `platform-success-rate.md`**
+5. **读取 `platform-success-rate.md`** — 读取各平台成功率统计
    → 成功率 < 30% 的平台，跳过
    → 成功率 < 70% 的平台，作为备选
+   → **技术细节不在此文件中**，如有疑问回到步骤 1 读 `lessons/platforms.md`
 6. **执行 `link-autopilot log`** — 查看当日平台提交情况
    → 超过单日上限的平台，本次跳过
 7. **执行 `link-autopilot email list`** — 查看已有账号，复用 token/密码
@@ -215,7 +223,7 @@ link-autopilot done {域名} {平台名} {URL1} {URL2} ...
 ```
 
 - **铺设成功** → `link-autopilot done` 自动将平台名追加到该 URL 的数组中
-- **铺设失败** → 在 `platform-success-rate.md` 记录失败 + 分析原因写入 `lessons/troubleshooting.md`
+- **铺设失败** → 在 `platform-success-rate.md` 更新失败计数和失败原因摘要；**技术细节和异常分析写入 `lessons/troubleshooting.md`，不重复写入 `platform-success-rate.md`**
 - **主动跳过** → 不记录，换其他平台继续尝试
 
 外链 URL、日期、失败原因等详情记录在 `.agent-memory/blast/history/{日期}-{时分}.md` 中，不在此文件重复存储。
@@ -307,13 +315,13 @@ Agent 在本项目中具备以下能力，**不需要人类手动操作**：
 
 ### 平台成功率记录
 
-维护 `.agent-memory/blast/platform-success-rate.md`，记录各平台的历史表现。格式为每平台独立区块（见文件本身），包含总尝试/成功/失败/成功率、最后尝试日期、尝试记录和备注。
+维护 `.agent-memory/blast/platform-success-rate.md`，记录各平台的历史表现。格式为每平台独立区块，包含总尝试/成功/失败/成功率、最后尝试日期、尝试记录和**简短备注**。
 
 **记录规则**：
 
 - 每次任务结束时更新此表。
 - 成功率 = 成功数 / 总尝试数，保留整数百分比。
-- 备注栏记录平台特性变化（如审核变严、封号风险、文案偏好等）。
+- **备注栏只记录统计相关的简短说明**（如失败原因、IP 封禁疑似、服务异常等），**不记录 API 格式、认证方式、字段名等技术细节**——那些写入 `lessons/platforms.md`。
 - **优先使用成功率 >= 70% 的平台**，成功率 < 30% 的平台暂时停用，一个月后再试。
 - 新平台由 [[link-explore]] 技能验证通过后写入此表，初始标记为"新验证"。
 

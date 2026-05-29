@@ -39,9 +39,13 @@ metadata:
 
 执行前读取以下文件，了解已知平台全貌：
 
-1. **`.agent-memory/blast/platform-success-rate.md`** — 当前所有平台的尝试记录和成功率
-2. **`.agent-memory/blast/lessons/platforms.md`** — 各平台特性、认证方式、已知坑点
-3. **`.backlink-data/accounts.json`** — 已有账号列表（避免重复注册同一平台）
+| 文件 | 读取内容 | 不读内容 |
+|------|---------|---------|
+| `platform-success-rate.md` | 各平台成功率、尝试次数、最后尝试日期 | **不读** API 格式、认证方式等技术细节 |
+| `lessons/platforms.md` | 各平台 API 格式、认证方式、频率上限、注意事项、不可用平台列表 | **不读** 统计数据 |
+| `.backlink-data/accounts.json` | 已有账号列表（避免重复注册） | |
+
+**两个文件各司其职，不重复。** `platform-success-rate.md` 只存统计数据；`lessons/platforms.md` 只存技术细节和经验教训。
 
 ### Step 2：确定探索方向
 
@@ -196,14 +200,15 @@ Agent 必须在历史记录中确认以下项已完成：
 
 验证通过的平台执行以下注册操作：
 
-1. **更新 `platform-success-rate.md`**
+1. **更新 `platform-success-rate.md`**（只存统计数据）
    - 新增平台独立区块
    - 初始数据：总尝试 = 1，成功 = 1（探索成功），成功率 = 100%
-   - 备注栏记录：探索日期、链接属性、审核时间、注册难度、内容偏好
+   - 备注栏只写统计相关简短说明（如"首次探索成功"），**不写** API 格式、认证方式、字段名等技术细节
 
-2. **更新 `lessons/platforms.md`**
-   - 记录平台特性：域名、功能路径、认证方式、内容格式、频率上限
+2. **更新 `lessons/platforms.md`**（只存技术细节）
+   - 记录平台特性：域名、功能路径、认证方式、内容格式、频率上限、注意事项
    - 标记为"已验证可用"
+   - **不写** 尝试次数、成功率等统计数据——那些只在 `platform-success-rate.md` 中更新
 
 3. **更新 `lessons/rate-limiting.md`**（如测试中获得频率数据）
 
